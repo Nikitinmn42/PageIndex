@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -101,12 +102,11 @@ public class PageProcessor {
             dictionary = fileScanner.tokens()
                     .map(s -> Jsoup.parseBodyFragment(s).text() + "\n")
                     .flatMap(line -> Arrays.stream(line.toLowerCase().split("([\\s\\p{Punct}&&[^-]])+")))
-                    .filter(word -> word.matches("\\w+(-\\w+)*"))
+                    .filter(word -> word.matches("(?U)\\w+(-\\w+)*"))
                     .collect(Collectors.groupingBy(word -> word, Collectors.counting()));
         } catch (FileNotFoundException e) {
             Logger.getGlobal().log(Level.SEVERE, e.getMessage(), e);
         }
         return dictionary == null ? null : new PageIndex(pageUrl, pageFile, dictionary, LocalDateTime.now());
     }
-
 }
