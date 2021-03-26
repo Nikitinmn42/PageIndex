@@ -8,7 +8,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.IDN;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -17,7 +19,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,18 +71,27 @@ public class PageProcessor {
     }
 
     private boolean isUrlCorrect() {
-        return pageUrl.matches("https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
+        return pageUrl.matches("(?U)https?://[-\\w+&@#/%?=~|!:,.;()]*[-\\w+&@#/%=~|()]");
     }
 
     private File downloadFromUrl() {
         Path pagePath = Path.of(pageFilePath);
         File file = null;
-        try (Scanner pageScanner = new Scanner(new URL(pageUrl).openStream()).useDelimiter("\n")) {
+        try (Scanner pageScanner = new Scanner(new URL(encodeUrl()).openStream()).useDelimiter("\n")) {
             file = writeFile(pagePath, pageScanner.tokens());
         } catch (IOException e) {
             Logger.getGlobal().log(Level.SEVERE, e.getMessage(), e);
         }
         return file;
+    }
+
+    private String encodeUrl() {
+        if (StandardCharsets.US_ASCII.newEncoder().canEncode(pageUrl)) {
+            return pageUrl;
+        }
+        String[] urlSplit = pageUrl.split("(://)|/");
+        return urlSplit[0] + "://" + IDN.toASCII(urlSplit[1]) + "/" +
+                String.join("/", Arrays.copyOfRange(urlSplit, 2, urlSplit.length));
     }
 
     private File writeFile(Path path, Stream<String> stringStream) throws IOException {
