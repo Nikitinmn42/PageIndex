@@ -1,12 +1,11 @@
 package org.test.assignment.pageindex;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.IDN;
 import java.net.URL;
@@ -108,13 +107,14 @@ public class PageProcessor {
 
     private PageIndex countWords(File pageFile) {
         Map<String, Long> dictionary = null;
-        try (Scanner fileScanner = new Scanner(new FileInputStream(pageFile)).useDelimiter("\n")) {
-            dictionary = fileScanner.tokens()
-                    .map(s -> Jsoup.parseBodyFragment(s).text() + "\n")
+        try {
+            Element body = Jsoup.parse(pageFile, "UTF-8").body();
+            dictionary = body.getAllElements().stream()
+                    .map(Element::ownText)
                     .flatMap(line -> Arrays.stream(line.toLowerCase().split("([\\s\\p{Punct}&&[^-]])+")))
                     .filter(word -> word.matches("(?U)\\w+(-\\w+)*"))
                     .collect(Collectors.groupingBy(word -> word, Collectors.counting()));
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             Logger.getGlobal().log(Level.SEVERE, e.getMessage(), e);
         }
         return dictionary == null ? null : new PageIndex(pageUrl, pageFile, dictionary, LocalDateTime.now());
