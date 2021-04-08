@@ -1,5 +1,7 @@
 package org.test.assignment.pageindex;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -9,6 +11,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 
+@Data
+@NoArgsConstructor
 @Entity
 @Component
 public class PageIndex {
@@ -27,10 +31,6 @@ public class PageIndex {
     private LocalDateTime lastUpdate;
 
 
-    public PageIndex() {
-
-    }
-
     public PageIndex(String pageUrl, File pageFile, Map<String, Long> dictionary, LocalDateTime lastUpdate) {
         this.pageUrl = pageUrl;
         this.pageFile = pageFile;
@@ -40,29 +40,5 @@ public class PageIndex {
 
     public Stream<Map.Entry<String, Long>> getDictionaryEntries() {
         return dictionary.entrySet().stream();
-    }
-
-    public void setLastUpdate(LocalDateTime lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPageUrl() {
-        return pageUrl;
-    }
-
-    public void setPageUrl(String pageUrl) {
-        this.pageUrl = pageUrl;
-    }
-
-    public Map<String, Long> getDictionary() {
-        return dictionary;
-    }
-
-    public void setDictionary(Map<String, Long> dictionary) {
-        this.dictionary = dictionary;
     }
 }

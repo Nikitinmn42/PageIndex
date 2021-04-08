@@ -1,5 +1,6 @@
 package org.test.assignment.pageindex;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,12 +11,8 @@ import java.time.LocalDateTime;
 @Service
 public class PageIndexService {
 
+    @Setter(onMethod_ = @Autowired)
     private PageIndexRepository pageIndexRepository;
-
-    @Autowired
-    public void setPageIndexRepository(PageIndexRepository pageIndexRepository) {
-        this.pageIndexRepository = pageIndexRepository;
-    }
 
     @Transactional
     public void addPageIndex(PageIndex pageIndex) {
@@ -41,5 +38,4 @@ public class PageIndexService {
         pageIndex.getDictionaryEntries()
                 .forEach(entry -> System.out.println(entry.getKey() + " - " + entry.getValue()));
     }
-
 }

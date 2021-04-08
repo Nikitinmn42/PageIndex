@@ -1,5 +1,7 @@
 package org.test.assignment.pageindex;
 
+import lombok.Data;
+import lombok.Setter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,29 +27,15 @@ import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
 
+@Data
 @Component
 public class PageProcessor {
 
     private final String pageFilePath = "./page.html";
 
     private String pageUrl;
+    @Setter(onMethod_ = @Autowired)
     private PageIndexService pageIndexService;
-
-    public PageProcessor() {
-    }
-
-    public PageProcessor(String pageUrl) {
-        this.pageUrl = pageUrl;
-    }
-
-    @Autowired
-    public void setPageIndexService(PageIndexService pageIndexService) {
-        this.pageIndexService = pageIndexService;
-    }
-
-    public void setPageUrl(String pageUrl) {
-        this.pageUrl = pageUrl;
-    }
 
     public void processPage() {
         if (isUrlCorrect()) {
